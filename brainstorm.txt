@@ -1,0 +1,23 @@
+Problem: Pygame or Tkinter?
+Which will be easier to expose the game API to the algorithms?
+Or algos don't have to directly use game API. It can be a separate handler, then it wouldn't matter what changes I make
+to either, I only have to change the handler.
+
+class Algo:
+    # how to define state, move?
+    def move(state) -> move
+
+class Mancala:
+    self.board
+    self.player1
+    self.player2
+
+    def init()
+    def start()
+    def calc_results()
+
+class Board:
+    self.spaces
+
+class Player:
+    def move
