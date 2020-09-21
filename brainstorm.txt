@@ -21,3 +21,22 @@ class Board:
 
 class Player:
     def move
+
+
+design text-based game first, then plug into pygame? or start with pygame initially? ideally, the game logic doesn't depend on either
+presentation method. how to do that?
+
+1. mancala text-based
+2. abstract it s.t.
+    * i can plug it into gui or text-based
+    * i can use any algo/human self to interface w/ it
+
+self has board side, or board has both sides?
+
+reflections:
+    * how could design this so that it is testable? how to break it up into testable functions w/ minimal setup?
+
+game components should send game results/updates/messages to a component responsible for displaying the output and
+gathering user input
+
+remove magic numbers
