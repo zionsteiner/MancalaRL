@@ -40,3 +40,9 @@ game components should send game results/updates/messages to a component respons
 gathering user input
 
 remove magic numbers
+
+need to extract game logic from game controller and players
+
+if minimax takes a long time, try caching the tree
+    * multiple move sequences could lead to the same board state. use this observation
+    * to optimize tree computation
