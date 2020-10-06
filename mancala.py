@@ -51,18 +51,23 @@ class TextPlayer(Player):
 
 
 class MinimaxPlayer(Player):
-    def __init__(self, player_id, depth=4):
+    def __init__(self, player_id, depth=6):
         super().__init__(player_id)
         self.board = None
         self.MAX_PLAYER = PLAYER1
         self.MIN_PLAYER = PLAYER2
+
         self.depth = depth
 
     def make_move(self, board):
         self.board = copy.deepcopy(board)
 
         start = time.time()
-        _, cell = self.min(self.depth, -100, 100)
+        cell = None
+        if self.player_id == PLAYER1:
+            _, cell = self.max(self.depth, -100, 100)
+        else:
+            _, cell = self.min(self.depth, -100, 100)
         end = time.time()
 
         print(f'Eval time: {end-start}s')
@@ -224,20 +229,32 @@ class MinimaxPlayer(Player):
         return None
 
 
+# ToDo: make logic methods static so MinimaxPlayer can use them instead of copy/pasting them
 class Game:
     def __init__(self, config=None):
-        self.p1 = TextPlayer(player_id=PLAYER1)
-
         # Defaults
         if not config:
-            config = {'opponent': Opponent.HUMAN}
+            config = {'player': PLAYER1,
+                      'opponent': Opponent.HUMAN}
 
-        if config['opponent'] == Opponent.HUMAN:
-            self.p2 = TextPlayer(player_id=PLAYER2)
-        elif config['opponent'] == Opponent.MINIMAX:
-            self.p2 = MinimaxPlayer(player_id=PLAYER2)
+        opponent_id = PLAYER2 if config['player'] == PLAYER1 else PLAYER1
 
-        self.curr_turn = self.p1.player_id
+        if config['player'] == PLAYER1:
+            self.p1 = TextPlayer(player_id=config['player'])
+
+            if config['opponent'] == Opponent.HUMAN:
+                self.p2 = TextPlayer(player_id=opponent_id)
+            elif config['opponent'] == Opponent.MINIMAX:
+                self.p2 = MinimaxPlayer(player_id=opponent_id)
+        else:
+            self.p2 = TextPlayer(player_id=config['player'])
+
+            if config['opponent'] == Opponent.HUMAN:
+                self.p1 = TextPlayer(player_id=opponent_id)
+            elif config['opponent'] == Opponent.MINIMAX:
+                self.p1 = MinimaxPlayer(player_id=opponent_id)
+
+        self.curr_turn = PLAYER1
 
         self.__board = [[4, 4, 4, 4, 4, 4, 0],
                         [4, 4, 4, 4, 4, 4, 0]]
@@ -412,15 +429,33 @@ def play_game(config):
 
 def config_prompt():
     # Prompt for and collect optional input
+    config = {}
+    
     print('Options')
     print('--------')
-    print('Play against: ')
+    
+    
+    print('Start as:')
+    print('1. Player 1')
+    print('2. Player 2')
+
+    is_valid_choice = False
+    choice = None
+    while not is_valid_choice:
+        choice = int(input('Make a selection'))
+        if 1 <= choice <= 2:
+            is_valid_choice = True
+        else:
+            print('Invalid choice\n')
+            
+    config['player'] = PLAYER1 if choice == PLAYER1 else PLAYER2
+    
+    print('Play against:')
     print('1. A human player')
     print('2. Minimax')
     # Add other algorithms here
 
     is_valid_choice = False
-
     choice = None
     while not is_valid_choice:
         choice = int(input('Make a selection'))
@@ -429,9 +464,9 @@ def config_prompt():
         else:
             print('Invalid choice\n')
 
-    opponent = Opponent(choice)
+    config['opponent'] = Opponent(choice)
 
-    return {'opponent': opponent}
+    return config
 
 
 if __name__ == '__main__':
